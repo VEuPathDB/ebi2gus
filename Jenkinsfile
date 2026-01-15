@@ -1,24 +1,13 @@
-node ('centos8') {
-  def tag
+#!groovy
 
-  if (env.BRANCH_NAME == 'master') {
-    tag = "latest"
-  } else {
-    tag = "${env.BRANCH_NAME}"
-  }
+@Library('pipelib')
+import org.veupathdb.lib.Builder
 
-  stage('checkout') {
-    checkout scm
-  }
+node('podbuild') {
+  def builder = new Builder(this)
 
-  stage('build') {
-    // build the container
-    sh "podman build --format=docker -t ebi2gus:${tag} $WORKSPACE"
-  }
-
-  stage('push') {
-    withCredentials([usernameColonPassword(credentialsId: '0f11d4d1-6557-423c-b5ae-693cc87f7b4b', variable: 'HUB_LOGIN')]) {
-      sh "podman push --creds \"$HUB_LOGIN\" ebi2gus:${tag} docker://docker.io/veupathdb/ebi2gus:${tag}"
-    }
-  }
+  builder.gitClone()
+  builder.buildContainers([
+    [ name: 'ebi2gus' ]
+  ])
 }
