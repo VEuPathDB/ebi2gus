@@ -437,7 +437,7 @@ sub ontologyTermFromTranscriptBiotype {
 
     my $name = $biotype->name();
 
-    if($name = 'misc_RNA') {
+    if($name eq 'misc_RNA') {
         $biotype->so_acc("SO:0000673");
     }
 
